@@ -190,6 +190,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\ClienteModel.cs" />
+    <Compile Include="Models\CustomValidation\CustomValidationCPFAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -436,6 +437,10 @@
     <ProjectReference Include="..\FI.AtividadeEntrevista\FI.AtividadeEntrevista.csproj">
       <Project>{38efe996-02d9-4d78-b084-f3b5602e6ed2}</Project>
       <Name>FI.AtividadeEntrevista</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Helpers\Helpers.csproj">
+      <Project>{CCB11DD8-8E97-414E-B3DE-50D20735219C}</Project>
+      <Name>Helpers</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

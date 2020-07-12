@@ -69,14 +69,15 @@ namespace FI.AtividadeEntrevista.BLL
         }
 
         /// <summary>
-        /// VerificaExistencia
+        /// Verifica se o CPF já está gravado.
         /// </summary>
-        /// <param name="CPF"></param>
-        /// <returns></returns>
-        public bool VerificarExistencia(string CPF)
+        /// <param name="cpf">CPF que será testado.</param>
+        /// <param name="idCliente">ID do cliente.</param>
+        /// <returns>Retorna <c><see langword="true"/></c> se já existe um cliente gravado em banco com este CPF.</returns>
+        public bool VerificarExistencia(string cpf, long idCliente)
         {
             DAL.DaoCliente cli = new DAL.DaoCliente();
-            return cli.VerificarExistencia(CPF);
+            return cli.VerificarExistencia(cpf, idCliente);
         }
     }
 }

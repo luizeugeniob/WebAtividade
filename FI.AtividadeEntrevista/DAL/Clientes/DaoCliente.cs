@@ -24,6 +24,7 @@ namespace FI.AtividadeEntrevista.DAL
             parametros.Add(new System.Data.SqlClient.SqlParameter("Nome", cliente.Nome));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Sobrenome", cliente.Sobrenome));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Nacionalidade", cliente.Nacionalidade));
+            parametros.Add(new System.Data.SqlClient.SqlParameter("CPF", cliente.CPF));
             parametros.Add(new System.Data.SqlClient.SqlParameter("CEP", cliente.CEP));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Estado", cliente.Estado));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Cidade", cliente.Cidade));
@@ -54,11 +55,12 @@ namespace FI.AtividadeEntrevista.DAL
             return cli.FirstOrDefault();
         }
 
-        internal bool VerificarExistencia(string CPF)
+        internal bool VerificarExistencia(string cpf, long idCliente)
         {
             List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
 
-            parametros.Add(new System.Data.SqlClient.SqlParameter("CPF", CPF));
+            parametros.Add(new System.Data.SqlClient.SqlParameter("CPF", cpf));
+            parametros.Add(new System.Data.SqlClient.SqlParameter("ID", idCliente));
 
             DataSet ds = base.Consultar("FI_SP_VerificaCliente", parametros);
 
@@ -113,6 +115,7 @@ namespace FI.AtividadeEntrevista.DAL
             parametros.Add(new System.Data.SqlClient.SqlParameter("Nome", cliente.Nome));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Sobrenome", cliente.Sobrenome));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Nacionalidade", cliente.Nacionalidade));
+            parametros.Add(new System.Data.SqlClient.SqlParameter("CPF", cliente.CPF));
             parametros.Add(new System.Data.SqlClient.SqlParameter("CEP", cliente.CEP));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Estado", cliente.Estado));
             parametros.Add(new System.Data.SqlClient.SqlParameter("Cidade", cliente.Cidade));
@@ -153,6 +156,7 @@ namespace FI.AtividadeEntrevista.DAL
                     cli.Estado = row.Field<string>("Estado");
                     cli.Logradouro = row.Field<string>("Logradouro");
                     cli.Nacionalidade = row.Field<string>("Nacionalidade");
+                    cli.CPF = row.Field<string>("CPF");
                     cli.Nome = row.Field<string>("Nome");
                     cli.Sobrenome = row.Field<string>("Sobrenome");
                     cli.Telefone = row.Field<string>("Telefone");
