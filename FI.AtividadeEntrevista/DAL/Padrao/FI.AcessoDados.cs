@@ -23,6 +23,11 @@ namespace FI.AtividadeEntrevista.DAL
             }
         }
 
+        public SqlConnection Connection()
+        {
+            return new SqlConnection(stringDeConexao);
+        }
+
         internal void Executar(string NomeProcedure, List<SqlParameter> parametros)
         {
             SqlCommand comando = new SqlCommand();

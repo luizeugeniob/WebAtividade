@@ -34,14 +34,12 @@ namespace WebAtividadeEntrevista.Controllers
                     List<string> erros = (from item in ModelState.Values
                                           from error in item.Errors
                                           select error.ErrorMessage).ToList();
+
                     throw new Exception(string.Join(Environment.NewLine, erros));
                 }
                 else
                 {
-                    if (bo.VerificarExistencia(model.CPF, model.Id))
-                        throw new Exception("O CPF informado já está cadastrado.");
-
-                    model.Id = bo.Incluir(new Cliente()
+                    Cliente cliente = new Cliente()
                     {
                         CEP = model.CEP,
                         Cidade = model.Cidade,
@@ -52,8 +50,25 @@ namespace WebAtividadeEntrevista.Controllers
                         CPF = model.CPF,
                         Nome = model.Nome,
                         Sobrenome = model.Sobrenome,
-                        Telefone = model.Telefone
-                    });
+                        Telefone = model.Telefone,
+                        Beneficiarios = new List<Beneficiario>()
+                    };
+
+                    if (model.Beneficiarios != null && model.Beneficiarios.Count > 0)
+                    {
+                        foreach (BeneficiarioModel beneficiario in model.Beneficiarios)
+                        {
+                            cliente.Beneficiarios.Add(new Beneficiario
+                            {
+                                Id = beneficiario.Id,
+                                CPF = beneficiario.CPFBeneficiario,
+                                Nome = beneficiario.NomeBeneficiario,
+                                IdCliente = beneficiario.IdCliente
+                            });
+                        }
+                    }
+
+                    model.Id = bo.Incluir(cliente);
                 }
             }
             catch (Exception ex)
@@ -84,7 +99,7 @@ namespace WebAtividadeEntrevista.Controllers
                     if (bo.VerificarExistencia(model.CPF, model.Id))
                         throw new Exception("O CPF informado já está cadastrado.");
 
-                    bo.Alterar(new Cliente()
+                    Cliente cliente = new Cliente()
                     {
                         Id = model.Id,
                         CEP = model.CEP,
@@ -96,8 +111,25 @@ namespace WebAtividadeEntrevista.Controllers
                         CPF = model.CPF,
                         Nome = model.Nome,
                         Sobrenome = model.Sobrenome,
-                        Telefone = model.Telefone
-                    });
+                        Telefone = model.Telefone,
+                        Beneficiarios = new List<Beneficiario>()
+                    };
+
+                    if (model.Beneficiarios != null && model.Beneficiarios.Count > 0)
+                    {
+                        foreach (BeneficiarioModel beneficiario in model.Beneficiarios)
+                        {
+                            cliente.Beneficiarios.Add(new Beneficiario
+                            {
+                                Id = beneficiario.Id,
+                                CPF = beneficiario.CPFBeneficiario,
+                                Nome = beneficiario.NomeBeneficiario,
+                                IdCliente = beneficiario.IdCliente
+                            });
+                        }
+                    }
+
+                    bo.Alterar(cliente);
                 }
             }
             catch (Exception ex)
@@ -130,7 +162,15 @@ namespace WebAtividadeEntrevista.Controllers
                     CPF = cliente.CPF,
                     Nome = cliente.Nome,
                     Sobrenome = cliente.Sobrenome,
-                    Telefone = cliente.Telefone
+                    Telefone = cliente.Telefone,
+                    Beneficiarios = (from ben in cliente.Beneficiarios
+                                     select new BeneficiarioModel
+                                     {
+                                         Id = ben.Id,
+                                         CPFBeneficiario = ben.CPF,
+                                         NomeBeneficiario = ben.Nome,
+                                         IdCliente = ben.IdCliente
+                                     }).ToList()
                 };
             }
 
@@ -162,6 +202,11 @@ namespace WebAtividadeEntrevista.Controllers
             {
                 return Json(new { Result = "ERROR", Message = ex.Message });
             }
+        }
+
+        public bool VerificaBeneficiarioCliente(string cpf, long idCliente)
+        {
+            return new BoCliente().VerificaBeneficiarioCliente(cpf, idCliente);
         }
     }
 }

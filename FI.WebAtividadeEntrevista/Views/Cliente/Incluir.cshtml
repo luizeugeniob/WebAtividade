@@ -1,12 +1,14 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Cadastrar Cliente";
 }
 @section scripts{
     <script>
         var urlPost = '@Url.Action("Incluir", "Cliente", new { area = "" })';
+        var obj = @Html.Raw(Json.Encode(Model));
     </script>
     @Scripts.Render("~/bundles/clientes")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/scripts/CustomValidation.js")
 }
 <h2>@Html.Raw(ViewBag.Title)</h2>
 @Html.Partial("Forms")

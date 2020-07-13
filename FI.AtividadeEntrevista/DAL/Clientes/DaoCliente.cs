@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FI.AtividadeEntrevista.DML;
+using Helpers;
 
 namespace FI.AtividadeEntrevista.DAL
 {
@@ -19,37 +18,74 @@ namespace FI.AtividadeEntrevista.DAL
         /// <param name="cliente">Objeto de cliente</param>
         internal long Incluir(DML.Cliente cliente)
         {
-            List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
-            
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Nome", cliente.Nome));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Sobrenome", cliente.Sobrenome));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Nacionalidade", cliente.Nacionalidade));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("CPF", cliente.CPF));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("CEP", cliente.CEP));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Estado", cliente.Estado));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Cidade", cliente.Cidade));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Logradouro", cliente.Logradouro));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Email", cliente.Email));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Telefone", cliente.Telefone));
-
-            DataSet ds = base.Consultar("FI_SP_IncClienteV2", parametros);
             long ret = 0;
-            if (ds.Tables[0].Rows.Count > 0)
-                long.TryParse(ds.Tables[0].Rows[0][0].ToString(), out ret);
+
+            using (System.Data.SqlClient.SqlConnection conexao = Connection())
+            {
+                conexao.Open();
+
+                System.Data.SqlClient.SqlCommand comando = conexao.CreateCommand();
+                System.Data.SqlClient.SqlTransaction transacao = conexao.BeginTransaction("IncluirCliente");
+
+                comando.Connection = conexao;
+                comando.Transaction = transacao;
+
+                try
+                {
+                    comando.CommandType = CommandType.StoredProcedure;
+                    comando.CommandText = "[FI_SP_IncClienteV2]";
+
+                    comando.Parameters.AddWithValue("@Nome", cliente.Nome);
+                    comando.Parameters.AddWithValue("@Sobrenome", cliente.Sobrenome);
+                    comando.Parameters.AddWithValue("@CPF", TextoHelper.RemoveNaoNumericos(cliente.CPF));
+                    comando.Parameters.AddWithValue("@Nacionalidade", cliente.Nacionalidade);
+                    comando.Parameters.AddWithValue("@CEP", cliente.CEP);
+                    comando.Parameters.AddWithValue("@Estado", cliente.Estado);
+                    comando.Parameters.AddWithValue("@Cidade", cliente.Cidade);
+                    comando.Parameters.AddWithValue("@Logradouro", cliente.Logradouro);
+                    comando.Parameters.AddWithValue("@Email", cliente.Email ?? string.Empty);
+                    comando.Parameters.AddWithValue("@Telefone", cliente.Telefone ?? string.Empty);
+
+                    var idCliente = comando.ExecuteScalar();
+
+                    cliente.Id = Convert.ToInt64(idCliente);
+
+                    foreach (Beneficiario beneficiario in cliente.Beneficiarios)
+                    {
+                        comando.Parameters.Clear();
+                        comando.CommandText = "[FI_SP_IncBeneficiario]";
+                        comando.Parameters.AddWithValue("@CPF", TextoHelper.RemoveNaoNumericos(beneficiario.CPF));
+                        comando.Parameters.AddWithValue("@NOME", beneficiario.Nome);
+                        comando.Parameters.AddWithValue("@IDCLIENTE", cliente.Id);
+
+                        comando.ExecuteNonQuery();
+                    }
+
+                    ret = cliente.Id;
+
+                    transacao.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transacao.Rollback();
+                }
+            }
+
             return ret;
         }
 
         /// <summary>
-        /// Inclui um novo cliente
+        /// Consulta um cliente
         /// </summary>
-        /// <param name="cliente">Objeto de cliente</param>
-        internal DML.Cliente Consultar(long Id)
+        /// <param name="id">Id do cliente que será consultado</param>
+        internal DML.Cliente Consultar(long id)
         {
             List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
 
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Id", Id));
+            parametros.Add(new System.Data.SqlClient.SqlParameter("Id", id));
 
             DataSet ds = base.Consultar("FI_SP_ConsCliente", parametros);
+
             List<DML.Cliente> cli = Converter(ds);
 
             return cli.FirstOrDefault();
@@ -59,10 +95,22 @@ namespace FI.AtividadeEntrevista.DAL
         {
             List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
 
-            parametros.Add(new System.Data.SqlClient.SqlParameter("CPF", cpf));
+            parametros.Add(new System.Data.SqlClient.SqlParameter("CPF", TextoHelper.RemoveNaoNumericos(cpf)));
             parametros.Add(new System.Data.SqlClient.SqlParameter("ID", idCliente));
 
             DataSet ds = base.Consultar("FI_SP_VerificaCliente", parametros);
+
+            return ds.Tables[0].Rows.Count > 0;
+        }
+
+        internal bool VerificaBeneficiarioCliente(string cpf, long idCliente)
+        {
+            List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
+
+            parametros.Add(new System.Data.SqlClient.SqlParameter("CPF", TextoHelper.RemoveNaoNumericos(cpf)));
+            parametros.Add(new System.Data.SqlClient.SqlParameter("IDCLIENTE", idCliente));
+
+            DataSet ds = base.Consultar("FI_SP_VerificaBeneficiarioCliente", parametros);
 
             return ds.Tables[0].Rows.Count > 0;
         }
@@ -105,28 +153,78 @@ namespace FI.AtividadeEntrevista.DAL
         }
 
         /// <summary>
-        /// Inclui um novo cliente
+        /// Altera os dados de um cliente já inserido.
         /// </summary>
         /// <param name="cliente">Objeto de cliente</param>
-        internal void Alterar(DML.Cliente cliente)
+        internal long Alterar(DML.Cliente cliente)
         {
-            List<System.Data.SqlClient.SqlParameter> parametros = new List<System.Data.SqlClient.SqlParameter>();
+            long ret = 0;
 
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Nome", cliente.Nome));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Sobrenome", cliente.Sobrenome));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Nacionalidade", cliente.Nacionalidade));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("CPF", cliente.CPF));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("CEP", cliente.CEP));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Estado", cliente.Estado));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Cidade", cliente.Cidade));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Logradouro", cliente.Logradouro));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Email", cliente.Email));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("Telefone", cliente.Telefone));
-            parametros.Add(new System.Data.SqlClient.SqlParameter("ID", cliente.Id));
+            using (System.Data.SqlClient.SqlConnection conexao = Connection())
+            {
+                conexao.Open();
 
-            base.Executar("FI_SP_AltCliente", parametros);
+                System.Data.SqlClient.SqlCommand comando = conexao.CreateCommand();
+                System.Data.SqlClient.SqlTransaction transacao = conexao.BeginTransaction("AlterarCliente");
+
+                comando.Connection = conexao;
+                comando.Transaction = transacao;
+
+                try
+                {
+                    comando.CommandType = CommandType.StoredProcedure;
+                    comando.CommandText = "[FI_SP_AltCliente]";
+
+                    comando.Parameters.AddWithValue("@Nome", cliente.Nome);
+                    comando.Parameters.AddWithValue("@Sobrenome", cliente.Sobrenome);
+                    comando.Parameters.AddWithValue("@CPF", TextoHelper.RemoveNaoNumericos(cliente.CPF));
+                    comando.Parameters.AddWithValue("@Nacionalidade", cliente.Nacionalidade);
+                    comando.Parameters.AddWithValue("@CEP", cliente.CEP);
+                    comando.Parameters.AddWithValue("@Estado", cliente.Estado);
+                    comando.Parameters.AddWithValue("@Cidade", cliente.Cidade);
+                    comando.Parameters.AddWithValue("@Logradouro", cliente.Logradouro);
+                    comando.Parameters.AddWithValue("@Email", cliente.Email ?? string.Empty);
+                    comando.Parameters.AddWithValue("@Telefone", cliente.Telefone ?? string.Empty);
+                    comando.Parameters.AddWithValue("@ID", cliente.Id);
+
+                    comando.ExecuteNonQuery();
+
+                    foreach (var item in cliente.Beneficiarios)
+                    {
+                        comando.Parameters.Clear();
+
+                        if (item.Id == 0)
+                        {
+                            comando.CommandText = "[FI_SP_IncBeneficiario]";
+
+                            comando.Parameters.AddWithValue("@CPF", TextoHelper.RemoveNaoNumericos(item.CPF));
+                            comando.Parameters.AddWithValue("@NOME", item.Nome);
+                            comando.Parameters.AddWithValue("@IDCLIENTE", cliente.Id);
+                        }
+                        else
+                        {
+                            comando.CommandText = "[FI_SP_AltBeneficiario]";
+
+                            comando.Parameters.AddWithValue("@ID", item.Id);
+                            comando.Parameters.AddWithValue("@CPF", TextoHelper.RemoveNaoNumericos(item.CPF));
+                            comando.Parameters.AddWithValue("@NOME", item.Nome);
+                        }
+
+                        comando.ExecuteNonQuery();
+                    }
+
+                    ret = cliente.Id;
+
+                    transacao.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transacao.Rollback();
+                }
+            }
+
+            return ret;
         }
-
 
         /// <summary>
         /// Excluir Cliente

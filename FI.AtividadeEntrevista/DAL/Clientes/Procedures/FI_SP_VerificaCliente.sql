@@ -1,5 +1,5 @@
 ﻿CREATE OR ALTER PROC [dbo].[FI_SP_VerificaCliente]
-	@CPF VARCHAR(14),
+	@CPF VARCHAR(11),
 	@ID BIGINT
 AS
 BEGIN

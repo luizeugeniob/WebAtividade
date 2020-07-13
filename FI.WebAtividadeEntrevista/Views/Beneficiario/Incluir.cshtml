@@ -1,0 +1,48 @@
+﻿@model WebAtividadeEntrevista.Models.BeneficiarioModel
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+<div class="modal fade" id="modalBeneficiarios" tabindex="-1" role="dialog" aria-labelledby="beneficiariosModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="beneficiariosModalLabel">Beneficiarios</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <form id="formBeneficiario" method="post">
+                        <div class="col-md-5">
+                            @Html.LabelFor(model => model.CPFBeneficiario, htmlAttributes: new { })
+                            @Html.EditorFor(model => model.CPFBeneficiario, new { htmlAttributes = new { @class = "form-control cpf", @placeholder = "Ex.: 999.999.999-99" } })
+                            @Html.ValidationMessageFor(model => model.CPFBeneficiario, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-5">
+                            @Html.LabelFor(model => model.NomeBeneficiario, htmlAttributes: new { })
+                            @Html.EditorFor(model => model.NomeBeneficiario, new { htmlAttributes = new { @class = "form-control", @placeholder = "João da Silva" } })
+                            @Html.ValidationMessageFor(model => model.NomeBeneficiario, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-2" style="margin-top:25px;">
+                            <button type="submit" class="btn btn-success mb-2" id="incluirBeneficiario">Incluir</button>
+                        </div>
+                    </form>
+                </div><br />
+                <div class="table-responsive">
+                    <table class="table table-striped" id="tabelaBeneficiarios">
+                        <thead>
+                            <tr>
+                                <th scope="col">CPF</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col" colspan="2">&nbsp;</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>

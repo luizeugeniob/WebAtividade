@@ -62,8 +62,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BLL\BoCliente.cs" />
+    <Compile Include="DAL\Clientes\DaoBeneficiario.cs" />
     <Compile Include="DAL\Clientes\DaoCliente.cs" />
     <Compile Include="DAL\Padrao\FI.AcessoDados.cs" />
+    <Compile Include="DML\Beneficiario.cs" />
     <Compile Include="DML\Cliente.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -88,6 +90,24 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Helpers\Helpers.csproj">
+      <Project>{CCB11DD8-8E97-414E-B3DE-50D20735219C}</Project>
+      <Name>Helpers</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DAL\Clientes\Procedures\FI_SP_ConsBeneficiarios.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DAL\Clientes\Procedures\FI_SP_IncBeneficiario.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DAL\Clientes\Procedures\FI_SP_VerificaBeneficiarioCliente.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DAL\Clientes\Procedures\FI_SP_AltBeneficiario.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

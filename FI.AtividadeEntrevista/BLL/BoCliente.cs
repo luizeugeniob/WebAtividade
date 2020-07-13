@@ -1,8 +1,7 @@
-﻿using System;
+﻿using FI.AtividadeEntrevista.DML;
+using Helpers;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FI.AtividadeEntrevista.BLL
 {
@@ -15,6 +14,19 @@ namespace FI.AtividadeEntrevista.BLL
         public long Incluir(DML.Cliente cliente)
         {
             DAL.DaoCliente cli = new DAL.DaoCliente();
+
+            if (!ValidacaoHelper.ValidaCPF(cliente.CPF))
+                throw new Exception("Informe um CPF válido!");
+
+            if (VerificarExistencia(cliente.CPF, cliente.Id))
+                throw new Exception("O CPF informado já está cadastrado!");
+
+            foreach (Beneficiario beneficiario in cliente.Beneficiarios)
+            {
+                if (!ValidacaoHelper.ValidaCPF(beneficiario.CPF))
+                    throw new Exception($"Informe um CPF válido para o beneficiário [{beneficiario.Nome}]!");
+            }
+
             return cli.Incluir(cliente);
         }
 
@@ -25,6 +37,13 @@ namespace FI.AtividadeEntrevista.BLL
         public void Alterar(DML.Cliente cliente)
         {
             DAL.DaoCliente cli = new DAL.DaoCliente();
+
+            if (!ValidacaoHelper.ValidaCPF(cliente.CPF))
+                throw new Exception($"O CPF do cliente [{cliente.Nome.ToUpper()}] não está correto!");
+
+            if (VerificarExistencia(cliente.CPF, cliente.Id))
+                throw new Exception($"Já existe um cliente com o CPF informado!");
+
             cli.Alterar(cliente);
         }
 
@@ -36,7 +55,12 @@ namespace FI.AtividadeEntrevista.BLL
         public DML.Cliente Consultar(long id)
         {
             DAL.DaoCliente cli = new DAL.DaoCliente();
-            return cli.Consultar(id);
+            DAL.DaoBeneficiario ben = new DAL.DaoBeneficiario();
+
+            Cliente cliente = cli.Consultar(id);
+            cliente.Beneficiarios = ben.Consultar(cliente.Id);
+
+            return cliente;
         }
 
         /// <summary>
@@ -78,6 +102,18 @@ namespace FI.AtividadeEntrevista.BLL
         {
             DAL.DaoCliente cli = new DAL.DaoCliente();
             return cli.VerificarExistencia(cpf, idCliente);
+        }
+
+        /// <summary>
+        /// Verifica se o beneficiário já foi informado para o atual cliente.
+        /// </summary>
+        /// <param name="cpf"></param>
+        /// <param name="idCliente"></param>
+        /// <returns></returns>
+        public bool VerificaBeneficiarioCliente(string cpf, long idCliente)
+        {
+            DAL.DaoCliente cli = new DAL.DaoCliente();
+            return cli.VerificaBeneficiarioCliente(cpf, idCliente);
         }
     }
 }

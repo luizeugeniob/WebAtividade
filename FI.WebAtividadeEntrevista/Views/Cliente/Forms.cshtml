@@ -1,41 +1,38 @@
-﻿<form id="formCadastro" method="post">
+﻿@model WebAtividadeEntrevista.Models.ClienteModel
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+<form id="formCadastro" method="post">
 
     <div class="row">
         <div class="col-md-6">
-            <div class="form-group">
-                <label for="Nome">Nome:</label>
-                <input required="required" type="text" class="form-control" id="Nome" name="Nome" placeholder="Ex.: João" maxlength="50">
-            </div>
+            @Html.LabelFor(model => model.Nome, htmlAttributes: new { })
+            @Html.EditorFor(model => model.Nome, new { htmlAttributes = new { @class = "form-control", @placeholder = "Ex.: João" } })
+            @Html.ValidationMessageFor(model => model.Nome, "", new { @class = "text-danger" })
         </div>
         <div class="col-md-6">
-            <div class="form-group">
-                <label for="Sobrenome">Sobrenome:</label>
-                <input required="required" type="text" class="form-control" id="Sobrenome" name="Sobrenome" placeholder="Ex.: da Silva" maxlength="255">
-            </div>
+            @Html.LabelFor(model => model.Sobrenome, htmlAttributes: new { })
+            @Html.EditorFor(model => model.Sobrenome, new { htmlAttributes = new { @class = "form-control", @placeholder = "Ex.: da Silva" } })
+            @Html.ValidationMessageFor(model => model.Sobrenome, "", new { @class = "text-danger" })
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-6">
-            <div class="form-group">
-                <label for="CPF">CPF:</label>
-                <input required="required" type="text" class="form-control cpf" id="CPF" name="CPF" placeholder="Ex.: 999.999.999-99" maxlength="14">
-            </div>
+            @Html.LabelFor(model => model.CPF, htmlAttributes: new { })
+            @Html.EditorFor(model => model.CPF, new { htmlAttributes = new { @class = "form-control cpf", @placeholder = "Ex.: 999.999.999-99" } })
+            @Html.ValidationMessageFor(model => model.CPF, "", new { @class = "text-danger" })
         </div>
         <div class="col-md-6">
-            <div class="form-group">
-                <label for="Nacionalidade">Nacionalidade:</label>
-                <input required="required" type="text" class="form-control" id="Nacionalidade" name="Nacionalidade" placeholder="Ex.: brasileira" maxlength="50">
-            </div>
+            @Html.LabelFor(model => model.Nacionalidade, htmlAttributes: new { })
+            @Html.EditorFor(model => model.Nacionalidade, new { htmlAttributes = new { @class = "form-control", @placeholder = "Ex.: brasileira" } })
+            @Html.ValidationMessageFor(model => model.Nacionalidade, "", new { @class = "text-danger" })
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-4">
-            <div class="form-group">
-                <label for="CEP">CEP:</label>
-                <input required="required" type="text" class="form-control cep" id="CEP" name="CEP" placeholder="Ex.: 01011-100" maxlength="9">
-            </div>
+            @Html.LabelFor(model => model.CEP, htmlAttributes: new { })
+            @Html.EditorFor(model => model.CEP, new { htmlAttributes = new { @class = "form-control cep", @placeholder = "Ex.: 01011-100" } })
+            @Html.ValidationMessageFor(model => model.CEP, "", new { @class = "text-danger" })
         </div>
         <div class="col-md-4">
             <div class="form-group">
@@ -49,33 +46,39 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="form-group">
-                <label for="Cidade">Cidade:</label>
-                <input required="required" type="text" class="form-control" id="Cidade" name="Cidade" maxlength="50" placeholder="Ex.: São Paulo">
-            </div>
+            @Html.LabelFor(model => model.Cidade, htmlAttributes: new { })
+            @Html.EditorFor(model => model.Cidade, new { htmlAttributes = new { @class = "form-control", @placeholder = "Ex.: São Paulo" } })
+            @Html.ValidationMessageFor(model => model.Cidade, "", new { @class = "text-danger" })
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-12">
-            <div class="form-group">
-                <label for="Logradouro">Logradouro:</label>
-                <input required="required" type="text" class="form-control" id="Logradouro" name="Logradouro" placeholder="Ex.: Rua Boa Vista 253" maxlength="500">
-            </div>
+            @Html.LabelFor(model => model.Logradouro, htmlAttributes: new { })
+            @Html.EditorFor(model => model.Logradouro, new { htmlAttributes = new { @class = "form-control", @placeholder = "Ex.: Rua Boa Vista 253" } })
+            @Html.ValidationMessageFor(model => model.Logradouro, "", new { @class = "text-danger" })
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-6">
-            <div class="form-group">
-                <label for="Email">E-mail:</label>
-                <input required="required" type="text" class="form-control" id="Email" name="Email" placeholder="Ex.: email@email.com" maxlength="2079">
-            </div>
+            @Html.LabelFor(model => model.Email, htmlAttributes: new { })
+            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", @placeholder = "Ex.: email@email.com" } })
+            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
         </div>
         <div class="col-md-6">
-            <div class="form-group">
-                <label for="Telefone">Telefone:</label>
-                <input required="required" type="tel" class="form-control telefone" id="Telefone" name="Telefone" placeholder="Ex.: (11) 2020-3030" maxlength="15">
+            @Html.LabelFor(model => model.Telefone, htmlAttributes: new { })
+            @Html.EditorFor(model => model.Telefone, new { htmlAttributes = new { @class = "form-control telefone", @placeholder = "Ex.: (11) 2020-3030" } })
+            @Html.ValidationMessageFor(model => model.Telefone, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <br />
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="pull-left">
+                <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#modalBeneficiarios">Beneficiários</button>
             </div>
         </div>
     </div>
@@ -90,3 +93,5 @@
     </div>
 
 </form>
+
+@{ Html.RenderPartial("~/Views/Beneficiario/Incluir.cshtml", new WebAtividadeEntrevista.Models.BeneficiarioModel()); }

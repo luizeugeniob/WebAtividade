@@ -29,15 +29,20 @@ namespace WebAtividadeEntrevista
             bundles.Add(new ScriptBundle("~/bundles/inputmask").Include(
             "~/Scripts/inputmask/jquery.inputmask.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
+                    "~/Scripts/jquery.validate*"));
+
             bundles.Add(new ScriptBundle("~/bundles/ready").Include(
             "~/Scripts/ready.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/clientes").Include(
-                      "~/Scripts/Clientes/FI.Clientes.js"));
+                      "~/Scripts/Clientes/FI.Clientes.js",
+                      "~/Scripts/Clientes/FI.Beneficiarios.js"));
             bundles.Add(new ScriptBundle("~/bundles/listClientes").Include(
                       "~/Scripts/Clientes/FI.ListClientes.js"));
             bundles.Add(new ScriptBundle("~/bundles/altClientes").Include(
-                      "~/Scripts/Clientes/FI.AltClientes.js"));
+                      "~/Scripts/Clientes/FI.AltClientes.js",
+                      "~/Scripts/Clientes/FI.Beneficiarios.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",

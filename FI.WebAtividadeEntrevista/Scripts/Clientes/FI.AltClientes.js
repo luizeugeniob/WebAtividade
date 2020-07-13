@@ -10,6 +10,19 @@
         $('#formCadastro #Cidade').val(obj.Cidade);
         $('#formCadastro #Logradouro').val(obj.Logradouro);
         $('#formCadastro #Telefone').val(obj.Telefone);
+
+        // Pega os beneficiários e popula a SessionStorage
+        let beneficiarios = obj.Beneficiarios;
+        sessionStorage.setItem("beneficiarios", JSON.stringify(beneficiarios));
+
+        // Percorre a lista de beneficiários para montar o grid da modal de beneficiários
+        obj.Beneficiarios.forEach(function (e) {
+            e.CPFBeneficiario = e.CPFBeneficiario.replace(/[^\d]/g, "");
+            e.CPFBeneficiario = e.CPFBeneficiario.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+
+            let contentRow = `<tr><td>${e.CPFBeneficiario}</td><td>${e.NomeBeneficiario}</td><td class='text-center mx-auto'><button name='alterarBeneficiario' class='btn btn-primary' data-identifier='${e.CPFBeneficiario}' data-command='alterar'>Alterar</button> <button name='excluirBeneficiario' class='btn btn-primary' data-identifier='${e.CPFBeneficiario}' data-command='excluir'>Excluir</button> </td></tr>`;
+            $('#tabelaBeneficiarios tbody').append(contentRow);
+        });
     }
 
     $('#formCadastro').submit(function (e) {
@@ -19,7 +32,7 @@
             url: urlPost,
             method: "POST",
             data: {
-                "NOME": $(this).find("#Nome").val(),
+                "Nome": $(this).find("#Nome").val(),
                 "CEP": $(this).find("#CEP").val(),
                 "Email": $(this).find("#Email").val(),
                 "Sobrenome": $(this).find("#Sobrenome").val(),
@@ -28,7 +41,8 @@
                 "Estado": $(this).find("#Estado").val(),
                 "Cidade": $(this).find("#Cidade").val(),
                 "Logradouro": $(this).find("#Logradouro").val(),
-                "Telefone": $(this).find("#Telefone").val()
+                "Telefone": $(this).find("#Telefone").val(),
+                "Beneficiarios": sessionStorage.getItem("beneficiarios") == "" ? [] : JSON.parse(sessionStorage.getItem("beneficiarios"))
             },
             error:
                 function (r) {
